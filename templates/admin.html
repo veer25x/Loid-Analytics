@@ -1,0 +1,1137 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel | Loid Analytics{% endblock %}
+
+{% block head_extra %}
+<!-- Chart.js for analytics -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- DataTables for better table display -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/dataTables.tailwindcss.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+{% endblock %}
+
+{% block nav_button %}
+<a href="/admin/logout" class="px-5 py-2.5 bg-gradient-to-r from-red-600 to-red-500 text-white font-medium rounded-full hover:shadow-lg hover:shadow-red-500/30 transition-all duration-300">
+    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+</a>
+{% endblock %}
+
+{% block mobile_nav_button %}
+<a href="/admin/logout" class="px-4 py-2 bg-red-500 text-white font-medium rounded-full">
+    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Admin Dashboard -->
+<div class="min-h-screen bg-gray-50 dark:bg-slate-900 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Admin Header -->
+        <div class="mb-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-3xl font-bold mb-2">Admin Dashboard</h1>
+                    <p class="text-gray-600 dark:text-gray-400">Manage your Loid Analytics platform</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="text-right">
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Logged in as</div>
+                        <div class="font-bold">{{ session.get('admin_username', 'Admin') }}</div>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-r from-primary-500 to-purple-500 flex items-center justify-center">
+                        <i class="fas fa-user-shield text-white text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Total Certificates -->
+            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-slate-700">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Total Certificates</p>
+                        <h3 class="text-2xl font-bold mt-2">{{ stats.total_certificates }}</h3>
+                    </div>
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-r from-primary-500 to-cyan-500 flex items-center justify-center">
+                        <i class="fas fa-certificate text-white text-2xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex items-center text-sm text-green-500">
+                        <i class="fas fa-arrow-up mr-1"></i>
+                        <span>{{ stats.certificates_growth }}% this month</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Courses -->
+            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-slate-700">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Active Courses</p>
+                        <h3 class="text-2xl font-bold mt-2">{{ stats.total_courses }}</h3>
+                    </div>
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                        <i class="fas fa-graduation-cap text-white text-2xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex items-center text-sm text-green-500">
+                        <i class="fas fa-arrow-up mr-1"></i>
+                        <span>{{ stats.courses_growth }}% enrollments</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Internships -->
+            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-slate-700">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Active Internships</p>
+                        <h3 class="text-2xl font-bold mt-2">{{ stats.total_internships }}</h3>
+                    </div>
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center">
+                        <i class="fas fa-briefcase text-white text-2xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex items-center text-sm text-green-500">
+                        <i class="fas fa-arrow-up mr-1"></i>
+                        <span>{{ stats.internships_growth }}% applications</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Verification Rate -->
+            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-slate-700">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Verification Rate</p>
+                        <h3 class="text-2xl font-bold mt-2">{{ stats.verification_rate }}%</h3>
+                    </div>
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 flex items-center justify-center">
+                        <i class="fas fa-shield-alt text-white text-2xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex items-center text-sm text-green-500">
+                        <i class="fas fa-check-circle mr-1"></i>
+                        <span>{{ stats.total_verifications }} verified</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts and Analytics -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Certificate Growth Chart -->
+            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-slate-700">
+                <h3 class="text-lg font-bold mb-4">Certificate Growth</h3>
+                <div class="h-64">
+                    <canvas id="certificateChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Course Popularity Chart -->
+            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-slate-700">
+                <h3 class="text-lg font-bold mb-4">Course Popularity</h3>
+                <div class="h-64">
+                    <canvas id="courseChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-slate-700 mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-bold">Recent Activity</h3>
+                <button onclick="refreshActivity()" class="px-4 py-2 bg-gray-100 dark:bg-slate-700 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors">
+                    <i class="fas fa-sync-alt mr-2"></i> Refresh
+                </button>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table id="activityTable" class="w-full">
+                    <thead>
+                        <tr class="border-b border-gray-200 dark:border-slate-700">
+                            <th class="py-3 px-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">Time</th>
+                            <th class="py-3 px-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">User</th>
+                            <th class="py-3 px-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">Activity</th>
+                            <th class="py-3 px-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">Details</th>
+                            <th class="py-3 px-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for activity in recent_activity %}
+                        <tr class="border-b border-gray-100 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50">
+                            <td class="py-3 px-4">
+                                <div class="text-sm font-medium">{{ activity.time }}</div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ activity.date }}</div>
+                            </td>
+                            <td class="py-3 px-4">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 rounded-full bg-gradient-to-r from-primary-500 to-cyan-500 flex items-center justify-center mr-3">
+                                        <i class="fas fa-user text-white text-xs"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium">{{ activity.user }}</div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">{{ activity.user_email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 rounded-lg {{ activity.type_color }} flex items-center justify-center mr-3">
+                                        <i class="{{ activity.type_icon }} text-white text-sm"></i>
+                                    </div>
+                                    <span class="font-medium">{{ activity.type }}</span>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4">
+                                <div class="text-sm">{{ activity.details }}</div>
+                                {% if activity.certificate_id %}
+                                <div class="text-xs text-primary-500 font-mono">{{ activity.certificate_id }}</div>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="px-3 py-1 rounded-full text-xs font-medium {{ activity.status_color }}">
+                                    {{ activity.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Management Tabs -->
+        <div class="mb-8">
+            <div class="border-b border-gray-200 dark:border-slate-700">
+                <nav class="-mb-px flex space-x-8" id="managementTabs">
+                    <button onclick="showTab('certificates')" class="tab-button py-4 px-1 border-b-2 font-medium text-sm active" data-tab="certificates">
+                        <i class="fas fa-certificate mr-2"></i> Certificates
+                    </button>
+                    <button onclick="showTab('courses')" class="tab-button py-4 px-1 border-b-2 font-medium text-sm" data-tab="courses">
+                        <i class="fas fa-graduation-cap mr-2"></i> Courses
+                    </button>
+                    <button onclick="showTab('internships')" class="tab-button py-4 px-1 border-b-2 font-medium text-sm" data-tab="internships">
+                        <i class="fas fa-briefcase mr-2"></i> Internships
+                    </button>
+                    <button onclick="showTab('users')" class="tab-button py-4 px-1 border-b-2 font-medium text-sm" data-tab="users">
+                        <i class="fas fa-users mr-2"></i> Users
+                    </button>
+                    <button onclick="showTab('settings')" class="tab-button py-4 px-1 border-b-2 font-medium text-sm" data-tab="settings">
+                        <i class="fas fa-cog mr-2"></i> Settings
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Tab Contents -->
+            <div class="py-6">
+                <!-- Certificates Tab -->
+                <div id="certificatesTab" class="tab-content">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                        <h3 class="text-xl font-bold">Certificate Management</h3>
+                        <div class="flex space-x-3">
+                            <button onclick="exportCertificates()" class="px-4 py-2 bg-gray-100 dark:bg-slate-700 rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors">
+                                <i class="fas fa-download mr-2"></i> Export CSV
+                            </button>
+                            <button onclick="showAddCertificateModal()" class="px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-500 text-white rounded-lg font-medium hover:shadow-lg transition-all duration-300">
+                                <i class="fas fa-plus mr-2"></i> Add Certificate
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-gray-200 dark:border-slate-700 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table id="certificatesTable" class="w-full">
+                                <thead class="bg-gray-50 dark:bg-slate-700">
+                                    <tr>
+                                        <th class="py-3 px-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">Certificate ID</th>
+                                        <th class="py-3 px-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">Name</th>
+                                        <th class="py-3 px-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">Course</th>
+                                        <th class="py-3 px-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">Issue Date</th>
+                                        <th class="py-3 px-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">Status</th>
+                                        <th class="py-3 px-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200 dark:divide-slate-700">
+                                    {% for cert in certificates %}
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/50">
+                                        <td class="py-3 px-4">
+                                            <div class="font-mono font-bold text-primary-600 dark:text-primary-400">{{ cert.id }}</div>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ cert.issued_at }}</div>
+                                        </td>
+                                        <td class="py-3 px-4">
+                                            <div class="font-medium">{{ cert.name }}</div>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ cert.email if cert.email else 'No email' }}</div>
+                                        </td>
+                                        <td class="py-3 px-4">
+                                            <div class="font-medium">{{ cert.course }}</div>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ cert.type if cert.type else 'Course' }}</div>
+                                        </td>
+                                        <td class="py-3 px-4">
+                                            <div class="font-medium">{{ cert.date }}</div>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ cert.verified_count }} verifications</div>
+                                        </td>
+                                        <td class="py-3 px-4">
+                                            {% if cert.status == 'active' %}
+                                            <span class="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                                <i class="fas fa-check-circle mr-1"></i> Active
+                                            </span>
+                                            {% elif cert.status == 'revoked' %}
+                                            <span class="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+                                                <i class="fas fa-ban mr-1"></i> Revoked
+                                            </span>
+                                            {% else %}
+                                            <span class="px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+                                                <i class="fas fa-clock mr-1"></i> Pending
+                                            </span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="py-3 px-4">
+                                            <div class="flex space-x-2">
+                                                <button onclick="viewCertificate('{{ cert.id }}')" class="p-2 text-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors" title="View">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button onclick="editCertificate('{{ cert.id }}')" class="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                {% if cert.status != 'revoked' %}
+                                                <button onclick="revokeCertificate('{{ cert.id }}')" class="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors" title="Revoke">
+                                                    <i class="fas fa-ban"></i>
+                                                </button>
+                                                {% else %}
+                                                <button onclick="activateCertificate('{{ cert.id }}')" class="p-2 text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors" title="Activate">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                {% endif %}
+                                                <button onclick="deleteCertificate('{{ cert.id }}')" class="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <div class="px-6 py-4 border-t border-gray-200 dark:border-slate-700">
+                            <div class="flex items-center justify-between">
+                                <div class="text-sm text-gray-500 dark:text-gray-400">
+                                    Showing <span class="font-medium">{{ certificates|length }}</span> certificates
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button class="px-3 py-1 border border-gray-300 dark:border-slate-600 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+                                        Previous
+                                    </button>
+                                    <button class="px-3 py-1 bg-primary-500 text-white rounded-lg text-sm hover:bg-primary-600 transition-colors">
+                                        1
+                                    </button>
+                                    <button class="px-3 py-1 border border-gray-300 dark:border-slate-600 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+                                        Next
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Courses Tab -->
+                <div id="coursesTab" class="tab-content hidden">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                        <h3 class="text-xl font-bold">Course Management</h3>
+                        <button onclick="showAddCourseModal()" class="px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-500 text-white rounded-lg font-medium hover:shadow-lg transition-all duration-300">
+                            <i class="fas fa-plus mr-2"></i> Add Course
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {% for course in courses %}
+                        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-gray-200 dark:border-slate-700 overflow-hidden">
+                            <div class="h-32 bg-gradient-to-r {{ course.gradient }}"></div>
+                            <div class="p-6">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div>
+                                        <h4 class="text-lg font-bold">{{ course.name }}</h4>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ course.category }}</p>
+                                    </div>
+                                    <span class="px-3 py-1 rounded-full text-xs font-medium {{ course.difficulty_color }}">
+                                        {{ course.difficulty }}
+                                    </span>
+                                </div>
+                                
+                                <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">{{ course.description[:100] }}...</p>
+                                
+                                <div class="flex items-center justify-between text-sm mb-6">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-users text-gray-400 mr-2"></i>
+                                        <span>{{ course.enrollments }} students</span>
+                                    </div>
+                                    <div class="font-bold text-primary-600 dark:text-primary-400">${{ course.price }}</div>
+                                </div>
+                                
+                                <div class="flex space-x-2">
+                                    <button onclick="editCourse('{{ course.id }}')" class="flex-1 py-2 bg-gray-100 dark:bg-slate-700 rounded-lg font-medium text-sm hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors">
+                                        <i class="fas fa-edit mr-2"></i> Edit
+                                    </button>
+                                    <button onclick="deleteCourse('{{ course.id }}')" class="flex-1 py-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg font-medium text-sm hover:bg-red-200 dark:hover:bg-red-800/30 transition-colors">
+                                        <i class="fas fa-trash mr-2"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Internships Tab -->
+                <div id="internshipsTab" class="tab-content hidden">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                        <h3 class="text-xl font-bold">Internship Management</h3>
+                        <button onclick="showAddInternshipModal()" class="px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-500 text-white rounded-lg font-medium hover:shadow-lg transition-all duration-300">
+                            <i class="fas fa-plus mr-2"></i> Add Internship
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        {% for internship in internships %}
+                        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-gray-200 dark:border-slate-700 p-6">
+                            <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                                <div class="flex-1">
+                                    <div class="flex items-start justify-between mb-2">
+                                        <div>
+                                            <h4 class="text-lg font-bold">{{ internship.position }}</h4>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ internship.company }} • {{ internship.location }}</p>
+                                        </div>
+                                        <span class="px-3 py-1 rounded-full text-xs font-medium {{ internship.type_color }}">
+                                            {{ internship.type }}
+                                        </span>
+                                    </div>
+                                    
+                                    <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">{{ internship.description[:150] }}...</p>
+                                    
+                                    <div class="flex flex-wrap gap-2 mb-4">
+                                        {% for skill in internship.skills %}
+                                        <span class="px-3 py-1 bg-gray-100 dark:bg-slate-700 rounded-full text-xs">{{ skill }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between text-sm">
+                                        <div class="flex items-center space-x-4">
+                                            <div class="flex items-center">
+                                                <i class="fas fa-clock text-gray-400 mr-2"></i>
+                                                <span>{{ internship.duration }}</span>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <i class="fas fa-dollar-sign text-gray-400 mr-2"></i>
+                                                <span>{{ internship.stipend }}</span>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <i class="fas fa-user-graduate text-gray-400 mr-2"></i>
+                                                <span>{{ internship.applications }} applicants</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex space-x-2 md:flex-col md:space-x-0 md:space-y-2">
+                                    <button onclick="viewApplications('{{ internship.id }}')" class="px-4 py-2 bg-gray-100 dark:bg-slate-700 rounded-lg font-medium text-sm hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors">
+                                        <i class="fas fa-list mr-2"></i> Applications
+                                    </button>
+                                    <button onclick="editInternship('{{ internship.id }}')" class="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg font-medium text-sm hover:bg-blue-200 dark:hover:bg-blue-800/30 transition-colors">
+                                        <i class="fas fa-edit mr-2"></i> Edit
+                                    </button>
+                                    <button onclick="deleteInternship('{{ internship.id }}')" class="px-4 py-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg font-medium text-sm hover:bg-red-200 dark:hover:bg-red-800/30 transition-colors">
+                                        <i class="fas fa-trash mr-2"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Users Tab -->
+                <div id="usersTab" class="tab-content hidden">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                        <h3 class="text-xl font-bold">User Management</h3>
+                        <div class="flex space-x-3">
+                            <div class="relative">
+                                <input type="text" placeholder="Search users..." class="pl-10 pr-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            </div>
+                            <button onclick="showAddUserModal()" class="px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-500 text-white rounded-lg font-medium hover:shadow-lg transition-all duration-300">
+                                <i class="fas fa-user-plus mr-2"></i> Add User
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-gray-200 dark:border-slate-700 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50 dark:bg-slate-700">
+                                    <tr>
+                                        <th class="py-3 px-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">User</th>
+                                        <th class="py-3 px-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">Email</th>
+                                        <th class="py-3 px-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">Role</th>
+                                        <th class="py-3 px-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">Joined</th>
+                                        <th class="py-3 px-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">Status</th>
+                                        <th class="py-3 px-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200 dark:divide-slate-700">
+                                    {% for user in users %}
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/50">
+                                        <td class="py-3 px-4">
+                                            <div class="flex items-center">
+                                                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-primary-500 to-cyan-500 flex items-center justify-center mr-3">
+                                                    <i class="fas fa-user text-white"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="font-medium">{{ user.name }}</div>
+                                                    <div class="text-xs text-gray-500 dark:text-gray-400">ID: {{ user.id }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-3 px-4">
+                                            <div class="font-medium">{{ user.email }}</div>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ user.phone if user.phone else 'No phone' }}</div>
+                                        </td>
+                                        <td class="py-3 px-4">
+                                            <span class="px-3 py-1 rounded-full text-xs font-medium {{ user.role_color }}">
+                                                {{ user.role }}
+                                            </span>
+                                        </td>
+                                        <td class="py-3 px-4">
+                                            <div class="font-medium">{{ user.joined_date }}</div>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ user.certificates_count }} certificates</div>
+                                        </td>
+                                        <td class="py-3 px-4">
+                                            {% if user.status == 'active' %}
+                                            <span class="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                                <i class="fas fa-check-circle mr-1"></i> Active
+                                            </span>
+                                            {% elif user.status == 'inactive' %}
+                                            <span class="px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+                                                <i class="fas fa-clock mr-1"></i> Inactive
+                                            </span>
+                                            {% else %}
+                                            <span class="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+                                                <i class="fas fa-ban mr-1"></i> Blocked
+                                            </span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="py-3 px-4">
+                                            <div class="flex space-x-2">
+                                                <button onclick="viewUser('{{ user.id }}')" class="p-2 text-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors" title="View">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button onclick="editUser('{{ user.id }}')" class="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                {% if user.status != 'blocked' %}
+                                                <button onclick="blockUser('{{ user.id }}')" class="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors" title="Block">
+                                                    <i class="fas fa-ban"></i>
+                                                </button>
+                                                {% else %}
+                                                <button onclick="activateUser('{{ user.id }}')" class="p-2 text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors" title="Activate">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Tab -->
+                <div id="settingsTab" class="tab-content hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <!-- General Settings -->
+                        <div class="lg:col-span-2">
+                            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-gray-200 dark:border-slate-700 p-6 mb-6">
+                                <h3 class="text-lg font-bold mb-6">General Settings</h3>
+                                
+                                <form id="settingsForm" class="space-y-6">
+                                    <div>
+                                        <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Platform Name</label>
+                                        <input type="text" value="Loid Analytics" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Contact Email</label>
+                                        <input type="email" value="contact@loidanalytics.com" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Default Certificate Template</label>
+                                        <select class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                                            <option>Standard</option>
+                                            <option>Premium</option>
+                                            <option>Executive</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Certificate Validity (Months)</label>
+                                        <input type="number" value="12" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between pt-4">
+                                        <button type="button" class="px-6 py-3 border-2 border-primary-500 text-primary-500 font-medium rounded-xl hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300">
+                                            Reset to Defaults
+                                        </button>
+                                        <button type="submit" class="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-500 text-white font-medium rounded-xl hover:shadow-lg transition-all duration-300">
+                                            Save Changes
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            
+                            <!-- Security Settings -->
+                            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-gray-200 dark:border-slate-700 p-6">
+                                <h3 class="text-lg font-bold mb-6">Security Settings</h3>
+                                
+                                <div class="space-y-6">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h4 class="font-medium mb-1">Two-Factor Authentication</h4>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Add an extra layer of security to your account</p>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" class="sr-only peer" checked>
+                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h4 class="font-medium mb-1">Email Notifications</h4>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Receive email alerts for important activities</p>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" class="sr-only peer" checked>
+                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h4 class="font-medium mb-1">API Access</h4>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Enable API for third-party integrations</p>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" class="sr-only peer">
+                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="border-t border-gray-200 dark:border-slate-700 pt-6">
+                                        <button onclick="changePassword()" class="px-6 py-3 bg-gradient-to-r from-amber-600 to-amber-500 text-white font-medium rounded-xl hover:shadow-lg transition-all duration-300">
+                                            <i class="fas fa-key mr-2"></i> Change Password
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- System Info -->
+                        <div>
+                            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-gray-200 dark:border-slate-700 p-6 mb-6">
+                                <h3 class="text-lg font-bold mb-6">System Information</h3>
+                                
+                                <div class="space-y-4">
+                                    <div>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Platform Version</p>
+                                        <p class="font-medium">v2.1.0</p>
+                                    </div>
+                                    
+                                    <div>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Last Updated</p>
+                                        <p class="font-medium">2024-03-20</p>
+                                    </div>
+                                    
+                                    <div>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Database Size</p>
+                                        <p class="font-medium">45.2 MB</p>
+                                    </div>
+                                    
+                                    <div>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Active Sessions</p>
+                                        <p class="font-medium">12</p>
+                                    </div>
+                                    
+                                    <div>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Uptime</p>
+                                        <p class="font-medium">99.8%</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Quick Actions -->
+                            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-gray-200 dark:border-slate-700 p-6">
+                                <h3 class="text-lg font-bold mb-6">Quick Actions</h3>
+                                
+                                <div class="space-y-3">
+                                    <button onclick="backupDatabase()" class="w-full px-4 py-3 bg-gray-100 dark:bg-slate-700 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors text-left">
+                                        <i class="fas fa-database mr-3"></i> Backup Database
+                                    </button>
+                                    
+                                    <button onclick="clearCache()" class="w-full px-4 py-3 bg-gray-100 dark:bg-slate-700 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors text-left">
+                                        <i class="fas fa-broom mr-3"></i> Clear Cache
+                                    </button>
+                                    
+                                    <button onclick="viewLogs()" class="w-full px-4 py-3 bg-gray-100 dark:bg-slate-700 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors text-left">
+                                        <i class="fas fa-file-alt mr-3"></i> View Logs
+                                    </button>
+                                    
+                                    <button onclick="generateReport()" class="w-full px-4 py-3 bg-gray-100 dark:bg-slate-700 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors text-left">
+                                        <i class="fas fa-chart-bar mr-3"></i> Generate Report
+                                    </button>
+                                    
+                                    <button onclick="systemUpdate()" class="w-full px-4 py-3 bg-gradient-to-r from-primary-600 to-primary-500 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-300 text-left">
+                                        <i class="fas fa-sync-alt mr-3"></i> Check for Updates
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Certificate Modal -->
+<div id="addCertificateModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-black/50 transition-opacity" aria-hidden="true"></div>
+        
+        <div class="inline-block align-bottom bg-white dark:bg-slate-800 rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+            <div class="px-6 py-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold">Add New Certificate</h3>
+                    <button onclick="closeModal('addCertificateModal')" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <form id="addCertificateForm" class="space-y-6">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Full Name *</label>
+                            <input type="text" required class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Email</label>
+                            <input type="email" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Course/Internship *</label>
+                        <select required class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                            <option value="">Select a course</option>
+                            <option>Python Programming Mastery</option>
+                            <option>Machine Learning Fundamentals</option>
+                            <option>Data Science & Analytics</option>
+                            <option>Deep Learning with TensorFlow</option>
+                        </select>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Issue Date *</label>
+                            <input type="date" required class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Certificate Type</label>
+                            <select class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                                <option>Standard</option>
+                                <option>Premium</option>
+                                <option>Executive</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Additional Notes</label>
+                        <textarea rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent"></textarea>
+                    </div>
+                    
+                    <div class="flex items-center justify-between pt-4">
+                        <button type="button" onclick="closeModal('addCertificateModal')" class="px-6 py-3 border-2 border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-slate-700 transition-all duration-300">
+                            Cancel
+                        </button>
+                        <button type="submit" class="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-500 text-white font-medium rounded-xl hover:shadow-lg transition-all duration-300">
+                            <i class="fas fa-plus mr-2"></i> Create Certificate
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmationModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-black/50 transition-opacity" aria-hidden="true"></div>
+        
+        <div class="inline-block align-bottom bg-white dark:bg-slate-800 rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
+            <div class="px-6 py-8 text-center">
+                <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-r from-red-500 to-pink-500 flex items-center justify-center mb-6">
+                    <i class="fas fa-exclamation-triangle text-white text-3xl"></i>
+                </div>
+                
+                <h3 id="confirmationTitle" class="text-2xl font-bold mb-4">Confirm Action</h3>
+                <p id="confirmationMessage" class="text-gray-600 dark:text-gray-300 mb-6">
+                    Are you sure you want to perform this action? This cannot be undone.
+                </p>
+                
+                <div class="flex space-x-3">
+                    <button onclick="closeModal('confirmationModal')" class="flex-1 py-3 border-2 border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-slate-700 transition-all duration-300">
+                        Cancel
+                    </button>
+                    <button onclick="confirmAction()" id="confirmActionButton" class="flex-1 py-3 bg-gradient-to-r from-red-600 to-red-500 text-white font-medium rounded-xl hover:shadow-lg transition-all duration-300">
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+.tab-button.active {
+    border-color: #0ea5e9;
+    color: #0ea5e9;
+}
+
+.tab-content {
+    display: block;
+}
+
+.tab-content.hidden {
+    display: none;
+}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize DataTables
+    $(document).ready(function() {
+        $('#activityTable').DataTable({
+            "pageLength": 5,
+            "order": [[0, 'desc']]
+        });
+        
+        $('#certificatesTable').DataTable({
+            "pageLength": 10,
+            "order": [[0, 'desc']]
+        });
+    });
+    
+    // Tab Management
+    function showTab(tabName) {
+        // Hide all tab contents
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.add('hidden');
+        });
+        
+        // Remove active class from all tab buttons
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.classList.remove('active');
+            button.classList.remove('border-primary-500', 'text-primary-500');
+            button.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+        });
+        
+        // Show selected tab content
+        document.getElementById(tabName + 'Tab').classList.remove('hidden');
+        
+        // Activate selected tab button
+        const activeButton = document.querySelector(`[data-tab="${tabName}"]`);
+        activeButton.classList.add('active', 'border-primary-500', 'text-primary-500');
+        activeButton.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+    }
+    
+    // Modal Functions
+    function showAddCertificateModal() {
+        document.getElementById('addCertificateModal').classList.remove('hidden');
+    }
+    
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.add('hidden');
+    }
+    
+    // Confirmation Modal
+    let currentAction = null;
+    let currentActionData = null;
+    
+    function showConfirmation(title, message, action, data = null) {
+        document.getElementById('confirmationTitle').textContent = title;
+        document.getElementById('confirmationMessage').textContent = message;
+        currentAction = action;
+        currentActionData = data;
+        document.getElementById('confirmationModal').classList.remove('hidden');
+    }
+    
+    function confirmAction() {
+        if (currentAction) {
+            currentAction(currentActionData);
+        }
+        closeModal('confirmationModal');
+    }
+    
+    // Certificate Actions
+    function viewCertificate(certId) {
+        alert(`Viewing certificate: ${certId}`);
+        // In real app, redirect to certificate view page
+    }
+    
+    function editCertificate(certId) {
+        alert(`Editing certificate: ${certId}`);
+        // In real app, show edit modal
+    }
+    
+    function revokeCertificate(certId) {
+        showConfirmation(
+            'Revoke Certificate',
+            `Are you sure you want to revoke certificate ${certId}? This will mark it as invalid.`,
+            function() {
+                alert(`Certificate ${certId} revoked`);
+                // In real app, call API to revoke
+            },
+            certId
+        );
+    }
+    
+    function activateCertificate(certId) {
+        showConfirmation(
+            'Activate Certificate',
+            `Are you sure you want to activate certificate ${certId}?`,
+            function() {
+                alert(`Certificate ${certId} activated`);
+                // In real app, call API to activate
+            },
+            certId
+        );
+    }
+    
+    function deleteCertificate(certId) {
+        showConfirmation(
+            'Delete Certificate',
+            `Are you sure you want to delete certificate ${certId}? This action cannot be undone.`,
+            function() {
+                alert(`Certificate ${certId} deleted`);
+                // In real app, call API to delete
+            },
+            certId
+        );
+    }
+    
+    // Export Functions
+    function exportCertificates() {
+        alert('Exporting certificates to CSV...');
+        // In real app, generate and download CSV
+    }
+    
+    function refreshActivity() {
+        alert('Refreshing activity...');
+        // In real app, reload activity data
+    }
+    
+    // Charts
+    const certificateChart = new Chart(
+        document.getElementById('certificateChart'),
+        {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Certificates Issued',
+                    data: [65, 78, 90, 85, 120, 150],
+                    borderColor: '#0ea5e9',
+                    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    }
+                }
+            }
+        }
+    );
+    
+    const courseChart = new Chart(
+        document.getElementById('courseChart'),
+        {
+            type: 'doughnut',
+            data: {
+                labels: ['Python', 'ML', 'Data Science', 'Deep Learning', 'Business Analytics'],
+                datasets: [{
+                    data: [35, 25, 20, 15, 5],
+                    backgroundColor: [
+                        '#0ea5e9',
+                        '#8b5cf6',
+                        '#10b981',
+                        '#f59e0b',
+                        '#ef4444'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        }
+    );
+    
+    // Other Management Functions
+    function showAddCourseModal() {
+        alert('Add course modal would open here');
+    }
+    
+    function editCourse(courseId) {
+        alert(`Editing course: ${courseId}`);
+    }
+    
+    function deleteCourse(courseId) {
+        showConfirmation(
+            'Delete Course',
+            `Are you sure you want to delete this course? All associated data will be removed.`,
+            function() {
+                alert(`Course ${courseId} deleted`);
+            },
+            courseId
+        );
+    }
+    
+    function showAddInternshipModal() {
+        alert('Add internship modal would open here');
+    }
+    
+    function editInternship(internshipId) {
+        alert(`Editing internship: ${internshipId}`);
+    }
+    
+    function deleteInternship(internshipId) {
+        showConfirmation(
+            'Delete Internship',
+            `Are you sure you want to delete this internship? All applications will be lost.`,
+            function() {
+                alert(`Internship ${internshipId} deleted`);
+            },
+            internshipId
+        );
+    }
+    
+    function viewApplications(internshipId) {
+        alert(`Viewing applications for: ${internshipId}`);
+    }
+    
+    function showAddUserModal() {
+        alert('Add user modal would open here');
+    }
+    
+    function viewUser(userId) {
+        alert(`Viewing user: ${userId}`);
+    }
+    
+    function editUser(userId) {
+        alert(`Editing user: ${userId}`);
+    }
+    
+    function blockUser(userId) {
+        showConfirmation(
+            'Block User',
+            `Are you sure you want to block this user? They will lose access to the platform.`,
+            function() {
+                alert(`User ${userId} blocked`);
+            },
+            userId
+        );
+    }
+    
+    function activateUser(userId) {
+        showConfirmation(
+            'Activate User',
+            `Are you sure you want to activate this user?`,
+            function() {
+                alert(`User ${userId} activated`);
+            },
+            userId
+        );
+    }
+    
+    // Settings Functions
+    function changePassword() {
+        alert('Change password modal would open here');
+    }
+    
+    function backupDatabase() {
+        alert('Backing up database...');
+    }
+    
+    function clearCache() {
+        showConfirmation(
+            'Clear Cache',
+            'Are you sure you want to clear all cache? This may temporarily slow down the system.',
+            function() {
+                alert('Cache cleared successfully');
+            }
+        );
+    }
+    
+    function viewLogs() {
+        alert('Opening system logs...');
+    }
+    
+    function generateReport() {
+        alert('Generating system report...');
+    }
+    
+    function systemUpdate() {
+        alert('Checking for updates...');
+    }
+</script>
+{% endblock %}
