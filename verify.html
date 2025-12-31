@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Certificate | Loid Analytics - Authenticate Your Achievement</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          fontFamily: {
+            'sans': ['Inter', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            'primary': {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              200: '#bae6fd',
+              300: '#7dd3fc',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+            },
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.5s ease-in-out',
+            'slide-up': 'slideUp 0.6s ease-out',
+            'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+            'gradient-shift': 'gradientShift 8s ease infinite',
+            'bounce-slow': 'bounce 3s infinite',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' },
+            },
+            slideUp: {
+              '0%': { transform: 'translateY(30px)', opacity: '0' },
+              '100%': { transform: 'translateY(0)', opacity: '1' },
+            },
+            pulseGlow: {
+              '0%, 100%': { boxShadow: '0 0 20px rgba(14, 165, 233, 0.3)' },
+              '50%': { boxShadow: '0 0 40px rgba(14, 165, 233, 0.6)' },
+            },
+            gradientShift: {
+              '0%, 100%': { backgroundPosition: '0% 50%' },
+              '50%': { backgroundPosition: '100% 50%' },
+            },
+          },
+          backgroundImage: {
+            'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+            'grid-pattern': 'linear-gradient(to right, rgba(100, 116, 139, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(100, 116, 139, 0.1) 1px, transparent 1px)',
+          },
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .dark .glass-effect {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .gradient-bg {
+      background: linear-gradient(-45deg, #6366f1, #8b5cf6, #0ea5e9, #10b981);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+    }
+    
+    .verification-card {
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    .verification-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+    
+    .dark .verification-card:hover {
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+    
+    .status-verified {
+      background: linear-gradient(135deg, #10b981, #059669);
+    }
+    
+    .status-invalid {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+    
+    .scanning-animation {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .scanning-animation::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      animation: scanning 2s infinite;
+    }
+    
+    @keyframes scanning {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+  </style>
+</head>
+
+<body class="bg-white dark:bg-slate-900 text-gray-800 dark:text-gray-200 font-sans min-h-screen">
+  <!-- Navigation -->
+  <nav class="sticky top-0 w-full z-50 transition-all duration-300 py-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-200/30 dark:border-slate-700/30 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center">
+        <!-- Logo -->
+        <div class="flex items-center space-x-2">
+          <a href="/" class="flex items-center space-x-2">
+            <div class="w-10 h-10 rounded-full gradient-bg flex items-center justify-center">
+              <i class="fas fa-brain text-white text-lg"></i>
+            </div>
+            <div>
+              <h1 class="text-xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent">Loid Analytics</h1>
+              <p class="text-xs text-gray-500 dark:text-gray-400">AI & Data Science</p>
+            </div>
+          </a>
+        </div>
+        
+        <!-- Desktop Navigation -->
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="/" class="font-medium hover:text-primary-500 transition-colors relative group">
+            Home
+            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-500 group-hover:w-full transition-all duration-300"></span>
+          </a>
+          <a href="/courses" class="font-medium hover:text-primary-500 transition-colors relative group">
+            Courses
+            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-500 group-hover:w-full transition-all duration-300"></span>
+          </a>
+          <a href="/internships" class="font-medium hover:text-primary-500 transition-colors relative group">
+            Internships
+            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-500 group-hover:w-full transition-all duration-300"></span>
+          </a>
+          <a href="/certificate" class="font-medium hover:text-primary-500 transition-colors relative group">
+            Certificate
+            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-500 group-hover:w-full transition-all duration-300"></span>
+          </a>
+          <a href="/verify" class="font-medium text-primary-500 relative group">
+            Verify
+            <span class="absolute -bottom-1 left-0 w-full h-0.5 bg-primary-500 transition-all duration-300"></span>
+          </a>
+          
+          <!-- Theme Toggle -->
+          <div class="flex items-center space-x-4">
+            <button id="themeToggle" class="p-2.5 rounded-full glass-effect hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
+              <i id="themeIcon" class="fas fa-moon text-primary-500"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Mobile Menu Button -->
+        <button id="mobileMenuButton" class="md:hidden p-2 rounded-lg glass-effect">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="md:hidden absolute top-full left-0 w-full bg-white dark:bg-slate-800 shadow-lg border-t border-gray-200 dark:border-slate-700 py-4 px-6 hidden animate-slide-up">
+      <div class="flex flex-col space-y-4">
+        <a href="/" class="font-medium py-2 hover:text-primary-500 transition-colors">Home</a>
+        <a href="/courses" class="font-medium py-2 hover:text-primary-500 transition-colors">Courses</a>
+        <a href="/internships" class="font-medium py-2 hover:text-primary-500 transition-colors">Internships</a>
+        <a href="/certificate" class="font-medium py-2 hover:text-primary-500 transition-colors">Certificate</a>
+        <a href="/verify" class="font-medium py-2 text-primary-500">Verify</a>
+        <div class="pt-4 border-t border-gray-200 dark:border-slate-700 flex justify-between">
+          <button id="themeToggleMobile" class="p-2 rounded-full glass-effect">
+            <i class="fas fa-moon text-primary-500"></i> Toggle Theme
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="relative overflow-hidden py-16 md:py-24 bg-gradient-to-br from-slate-900 to-primary-900 dark:from-slate-900 dark:to-slate-800 text-white">
+    <div class="absolute inset-0 bg-grid-pattern bg-grid-lg opacity-10"></div>
+    <div class="absolute top-10 left-10 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-10 right-10 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl"></div>
+    
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center animate-slide-up">
+        <div class="inline-flex items-center space-x-2 mb-6 px-4 py-2 rounded-full glass-effect">
+          <span class="w-2 h-2 bg-primary-400 rounded-full animate-pulse"></span>
+          <span class="text-sm font-medium">Verify Authenticity of Certificates</span>
+        </div>
+        
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+          <span class="block">Certificate</span>
+          <span class="block bg-gradient-to-r from-primary-400 to-cyan-400 bg-clip-text text-transparent">Verification Portal</span>
+        </h1>
+        
+        <p class="text-xl text-gray-300 max-w-3xl mx-auto mb-10">
+          Verify the authenticity of any Loid Analytics certificate using certificate ID, name, or QR code. Ensure your achievements are legitimate and recognized.
+        </p>
+        
+        <!-- Stats -->
+        <div class="flex flex-wrap justify-center gap-8 md:gap-16 mb-12">
+          <div class="text-center">
+            <div class="text-3xl md:text-4xl font-bold mb-2">50K+</div>
+            <div class="text-gray-300">Verified Certificates</div>
+          </div>
+          <div class="text-center">
+            <div class="text-3xl md:text-4xl font-bold mb-2">99.9%</div>
+            <div class="text-gray-300">Verification Accuracy</div>
+          </div>
+          <div class="text-center">
+            <div class="text-3xl md:text-4xl font-bold mb-2">Instant</div>
+            <div class="text-gray-300">Real-time Results</div>
+          </div>
+          <div class="text-center">
+            <div class="text-3xl md:text-4xl font-bold mb-2">Secure</div>
+            <div class="text-gray-300">Blockchain-backed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <section class="py-16 bg-white dark:bg-slate-900">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-3 gap-8">
+        <!-- Verification Form -->
+        <div class="lg:col-span-2">
+          <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 mb-8 border border-gray-200 dark:border-slate-700 verification-card">
+            <div class="flex items-center mb-8">
+              <div class="w-12 h-12 rounded-xl bg-gradient-to-r from-primary-500 to-cyan-500 flex items-center justify-center mr-4">
+                <i class="fas fa-search text-white text-xl"></i>
+              </div>
+              <div>
+                <h2 class="text-2xl font-bold">Verify Certificate</h2>
+                <p class="text-gray-600 dark:text-gray-400">Enter certificate details to verify authenticity</p>
+              </div>
+            </div>
+            
+            <div class="space-y-6">
+              <div>
+                <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2" for="certificateId">
+                  Certificate ID <span class="text-gray-500 dark:text-gray-400 text-sm">(Recommended)</span>
+                </label>
+                <div class="relative">
+                  <input type="text" id="certificateId" 
+                    class="w-full px-4 py-3 pl-12 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300"
+                    placeholder="LA-2024-XXXXX">
+                  <div class="absolute left-4 top-1/2 transform -translate-y-1/2">
+                    <i class="fas fa-fingerprint text-gray-400"></i>
+                  </div>
+                  <button onclick="scanQRCode()" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-primary-500 hover:text-primary-600">
+                    <i class="fas fa-qrcode text-lg"></i>
+                  </button>
+                </div>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  Find this on the bottom-right corner of your certificate
+                </p>
+              </div>
+              
+              <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2" for="fullName">
+                    Full Name
+                  </label>
+                  <div class="relative">
+                    <input type="text" id="fullName" 
+                      class="w-full px-4 py-3 pl-12 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300"
+                      placeholder="Enter full name as on certificate">
+                    <div class="absolute left-4 top-1/2 transform -translate-y-1/2">
+                      <i class="fas fa-user text-gray-400"></i>
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2" for="courseName">
+                    Course / Internship
+                  </label>
+                  <div class="relative">
+                    <input type="text" id="courseName" 
+                      class="w-full px-4 py-3 pl-12 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300"
+                      placeholder="Course or internship name">
+                    <div class="absolute left-4 top-1/2 transform -translate-y-1/2">
+                      <i class="fas fa-graduation-cap text-gray-400"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2" for="issueDate">
+                  Issue Date
+                </label>
+                <div class="relative">
+                  <input type="date" id="issueDate" 
+                    class="w-full px-4 py-3 pl-12 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300">
+                  <div class="absolute left-4 top-1/2 transform -translate-y-1/2">
+                    <i class="fas fa-calendar-alt text-gray-400"></i>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="flex items-center">
+                <input type="checkbox" id="consent" class="w-4 h-4 text-primary-500 rounded focus:ring-primary-500">
+                <label for="consent" class="ml-3 text-gray-700 dark:text-gray-300 text-sm">
+                  I consent to verification of this certificate's authenticity
+                </label>
+              </div>
+              
+              <button onclick="verifyCertificate()" 
+                class="w-full py-4 bg-gradient-to-r from-primary-600 to-primary-500 text-white font-bold rounded-xl hover:shadow-xl hover:shadow-primary-500/30 transition-all duration-300 transform hover:-translate-y-1 scanning-animation">
+                <i class="fas fa-shield-alt mr-2"></i> Verify Authenticity
+              </button>
+            </div>
+          </div>
+          
+          <!-- Recent Verifications -->
+          <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-slate-700">
+            <h3 class="text-xl font-bold mb-6">Recently Verified Certificates</h3>
+            <div class="space-y-4">
+              <div class="flex items-center justify-between p-4 bg-green-50 dark:bg-green-900/20 rounded-xl">
+                <div class="flex items-center">
+                  <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-800 flex items-center justify-center mr-4">
+                    <i class="fas fa-check text-green-600 dark:text-green-400"></i>
+                  </div>
+                  <div>
+                    <div class="font-medium">Alex Johnson</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">Machine Learning Fundamentals</div>
+                  </div>
+                </div>
+                <div class="text-sm text-gray-500">Verified 5 min ago</div>
+              </div>
+              
+              <div class="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
+                <div class="flex items-center">
+                  <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-800 flex items-center justify-center mr-4">
+                    <i class="fas fa-check text-blue-600 dark:text-blue-400"></i>
+                  </div>
+                  <div>
+                    <div class="font-medium">Sarah Miller</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">Data Science & Analytics</div>
+                  </div>
+                </div>
+                <div class="text-sm text-gray-500">Verified 15 min ago</div>
+              </div>
+              
+              <div class="flex items-center justify-between p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl">
+                <div class="flex items-center">
+                  <div class="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-800 flex items-center justify-center mr-4">
+                    <i class="fas fa-check text-amber-600 dark:text-amber-400"></i>
+                  </div>
+                  <div>
+                    <div class="font-medium">Michael Chen</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">Python Development Internship</div>
+                  </div>
+                </div>
+                <div class="text-sm text-gray-500">Verified 30 min ago</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Verification Result & Info -->
+        <div class="space-y-8">
+          <!-- Verification Result -->
+          <div id="verificationResult" class="hidden animate-fade-in">
+            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-slate-700 verification-card">
+              <div class="text-center mb-6">
+                <div id="resultIcon" class="w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4">
+                  <!-- Icon will be set dynamically -->
+                </div>
+                <h3 id="resultTitle" class="text-2xl font-bold mb-2"></h3>
+                <p id="resultMessage" class="text-gray-600 dark:text-gray-400"></p>
+              </div>
+              
+              <div id="certificateDetails" class="space-y-4 hidden">
+                <div class="border-t border-gray-200 dark:border-slate-700 pt-4">
+                  <h4 class="font-bold mb-3">Certificate Details</h4>
+                  <div class="space-y-3">
+                    <div class="flex justify-between">
+                      <span class="text-gray-600 dark:text-gray-400">Certificate ID:</span>
+                      <span id="detailId" class="font-mono font-bold"></span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-gray-600 dark:text-gray-400">Name:</span>
+                      <span id="detailName" class="font-medium"></span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-gray-600 dark:text-gray-400">Course:</span>
+                      <span id="detailCourse" class="font-medium"></span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-gray-600 dark:text-gray-400">Issue Date:</span>
+                      <span id="detailDate" class="font-medium"></span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-gray-600 dark:text-gray-400">Status:</span>
+                      <span id="detailStatus" class="font-medium"></span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="border-t border-gray-200 dark:border-slate-700 pt-4">
+                  <h4 class="font-bold mb-3">Actions</h4>
+                  <div class="grid grid-cols-2 gap-3">
+                    <button onclick="downloadVerification()" 
+                      class="py-3 bg-gray-200 dark:bg-slate-700 rounded-xl font-medium hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors">
+                      <i class="fas fa-download mr-2"></i> Download
+                    </button>
+                    <button onclick="shareVerification()" 
+                      class="py-3 bg-gray-200 dark:bg-slate-700 rounded-xl font-medium hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors">
+                      <i class="fas fa-share-alt mr-2"></i> Share
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <button onclick="newVerification()" 
+                class="w-full mt-6 py-3 border-2 border-primary-500 text-primary-500 font-medium rounded-xl hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300">
+                <i class="fas fa-redo mr-2"></i> Verify Another Certificate
+              </button>
+            </div>
+          </div>
+          
+          <!-- Verification Info -->
+          <div class="bg-gradient-to-r from-primary-600 to-primary-500 rounded-2xl p-8 text-white">
+            <div class="flex items-center mb-6">
+              <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center mr-4">
+                <i class="fas fa-info-circle text-white text-xl"></i>
+              </div>
+              <div>
+                <h3 class="text-xl font-bold">Verification Guide</h3>
+                <p class="text-white/80">How to verify certificates</p>
+              </div>
+            </div>
+            
+            <ul class="space-y-4">
+              <li class="flex items-start">
+                <div class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center mr-3 flex-shrink-0">
+                  <span class="text-sm font-bold">1</span>
+                </div>
+                <span>Use Certificate ID for fastest verification</span>
+              </li>
+              <li class="flex items-start">
+                <div class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center mr-3 flex-shrink-0">
+                  <span class="text-sm font-bold">2</span>
+                </div>
+                <span>Ensure all details match the certificate exactly</span>
+              </li>
+              <li class="flex items-start">
+                <div class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center mr-3 flex-shrink-0">
+                  <span class="text-sm font-bold">3</span>
+                </div>
+                <span>Verification is instant and free</span>
+              </li>
+              <li class="flex items-start">
+                <div class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center mr-3 flex-shrink-0">
+                  <span class="text-sm font-bold">4</span>
+                </div>
+                <span>Save or share verification results as proof</span>
+              </li>
+            </ul>
+          </div>
+          
+          <!-- QR Code Scanner -->
+          <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-slate-700">
+            <div class="flex items-center mb-6">
+              <div class="w-12 h-12 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mr-4">
+                <i class="fas fa-qrcode text-white text-xl"></i>
+              </div>
+              <div>
+                <h3 class="text-xl font-bold">QR Code Scanner</h3>
+                <p class="text-gray-600 dark:text-gray-400">Scan certificate QR code</p>
+              </div>
+            </div>
+            
+            <div class="text-center">
+              <div class="w-48 h-48 mx-auto mb-6 bg-gray-100 dark:bg-slate-700 rounded-2xl flex items-center justify-center relative overflow-hidden">
+                <div class="absolute inset-0 scanning-animation"></div>
+                <i class="fas fa-qrcode text-6xl text-gray-400"></i>
+              </div>
+              <p class="text-gray-600 dark:text-gray-400 mb-4">
+                Use your device camera to scan QR code on certificate
+              </p>
+              <button onclick="scanQRCode()" 
+                class="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium rounded-xl hover:shadow-lg transition-all duration-300">
+                <i class="fas fa-camera mr-2"></i> Scan QR Code
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-16 bg-gray-50 dark:bg-slate-800/50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
+        <p class="text-gray-600 dark:text-gray-400">Common questions about certificate verification</p>
+      </div>
+      
+      <div class="space-y-6">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-gray-200 dark:border-slate-700">
+          <h3 class="text-lg font-bold mb-2">How long does verification take?</h3>
+          <p class="text-gray-600 dark:text-gray-400">Verification is instant. Results are displayed immediately after submitting the certificate details.</p>
+        </div>
+        
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-gray-200 dark:border-slate-700">
+          <h3 class="text-lg font-bold mb-2">What if my certificate is not found?</h3>
+          <p class="text-gray-600 dark:text-gray-400">Ensure all details match exactly. Contact support@loidanalytics.com if you believe there's an error.</p>
+        </div>
+        
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-gray-200 dark:border-slate-700">
+          <h3 class="text-lg font-bold mb-2">Is verification free?</h3>
+          <p class="text-gray-600 dark:text-gray-400">Yes, certificate verification is completely free for everyone.</p>
+        </div>
+        
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-gray-200 dark:border-slate-700">
+          <h3 class="text-lg font-bold mb-2">Can I verify certificates from mobile?</h3>
+          <p class="text-gray-600 dark:text-gray-400">Yes, our verification portal is fully responsive and works on all devices including smartphones.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-slate-800 text-white py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid md:grid-cols-4 gap-8">
+        <!-- Company Info -->
+        <div>
+          <div class="flex items-center space-x-2 mb-6">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-primary-600 to-primary-500 flex items-center justify-center">
+              <i class="fas fa-brain text-white"></i>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold">Loid Analytics</h2>
+              <p class="text-sm text-gray-400">AI & Data Science Education</p>
+            </div>
+          </div>
+          <p class="text-gray-400 mb-6">Secure certificate verification for AI and Data Science achievements.</p>
+        </div>
+        
+        <!-- Quick Links -->
+        <div>
+          <h3 class="text-lg font-bold mb-6">Quick Links</h3>
+          <ul class="space-y-3">
+            <li><a href="/" class="text-gray-400 hover:text-white transition-colors">Home</a></li>
+            <li><a href="/courses" class="text-gray-400 hover:text-white transition-colors">Courses</a></li>
+            <li><a href="/internships" class="text-gray-400 hover:text-white transition-colors">Internships</a></li>
+            <li><a href="/certificate" class="text-gray-400 hover:text-white transition-colors">Certificate</a></li>
+            <li><a href="/verify" class="text-gray-400 hover:text-white transition-colors">Verify Certificate</a></li>
+          </ul>
+        </div>
+        
+        <!-- Contact -->
+        <div>
+          <h3 class="text-lg font-bold mb-6">Verification Support</h3>
+          <ul class="space-y-3">
+            <li class="flex items-start">
+              <i class="fas fa-envelope text-primary-400 mt-1 mr-3"></i>
+              <span class="text-gray-400">verification@loidanalytics.com</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-phone text-primary-400 mt-1 mr-3"></i>
+              <span class="text-gray-400">+1 (555) 123-4567</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-clock text-primary-400 mt-1 mr-3"></i>
+              <span class="text-gray-400">24/7 Support Available</span>
+            </li>
+          </ul>
+        </div>
+        
+        <!-- Newsletter -->
+        <div>
+          <h3 class="text-lg font-bold mb-6">Stay Updated</h3>
+          <p class="text-gray-400 mb-4">Get security updates and verification alerts.</p>
+          <div class="flex">
+            <input type="email" placeholder="Your email" class="flex-grow px-4 py-2 bg-slate-700 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+            <button class="px-4 py-2 bg-primary-500 rounded-r-lg hover:bg-primary-600 transition-colors">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="border-t border-slate-700 mt-12 pt-8 text-center text-gray-500 text-sm">
+        <p>&copy; 2024 Loid Analytics. All rights reserved. | <a href="#" class="hover:text-white transition-colors">Privacy Policy</a> | <a href="#" class="hover:text-white transition-colors">Terms of Service</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    // Theme Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const themeToggleMobile = document.getElementById('themeToggleMobile');
+    const themeIcon = document.getElementById('themeIcon');
+    const html = document.documentElement;
+    
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      html.classList.add('dark');
+      themeIcon.className = 'fas fa-sun text-yellow-400';
+    } else {
+      themeIcon.className = 'fas fa-moon text-primary-500';
+    }
+    
+    function toggleTheme() {
+      html.classList.toggle('dark');
+      const isDark = html.classList.contains('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      themeIcon.className = isDark ? 'fas fa-sun text-yellow-400' : 'fas fa-moon text-primary-500';
+    }
+    
+    themeToggle.addEventListener('click', toggleTheme);
+    if (themeToggleMobile) {
+      themeToggleMobile.addEventListener('click', toggleTheme);
+    }
+    
+    // Mobile Menu Toggle
+    const mobileMenuButton = document.getElementById('mobileMenuButton');
+    const mobileMenu = document.getElementById('mobileMenu');
+    
+    if (mobileMenuButton && mobileMenu) {
+      mobileMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+        mobileMenu.classList.toggle('animate-slide-up');
+        
+        const icon = mobileMenuButton.querySelector('i');
+        if (icon.classList.contains('fa-bars')) {
+          icon.className = 'fas fa-times text-xl';
+        } else {
+          icon.className = 'fas fa-bars text-xl';
+        }
+      });
+      
+      document.addEventListener('click', (e) => {
+        if (!mobileMenuButton.contains(e.target) && !mobileMenu.contains(e.target)) {
+          mobileMenu.classList.add('hidden');
+          mobileMenuButton.querySelector('i').className = 'fas fa-bars text-xl';
+        }
+      });
+    }
+    
+    // Sample certificate database (in real app, this would be from server)
+    const certificateDatabase = [
+      {
+        id: 'LA-2024-ABC12',
+        name: 'Alex Johnson',
+        course: 'Machine Learning Fundamentals',
+        date: '2024-03-15',
+        status: 'verified'
+      },
+      {
+        id: 'LA-2024-XYZ34',
+        name: 'Sarah Miller',
+        course: 'Data Science & Analytics',
+        date: '2024-02-28',
+        status: 'verified'
+      },
+      {
+        id: 'LA-2024-DEF56',
+        name: 'Michael Chen',
+        course: 'Python Development Internship',
+        date: '2024-03-20',
+        status: 'verified'
+      },
+      {
+        id: 'LA-2024-GHI78',
+        name: 'Emily Watson',
+        course: 'Deep Learning with TensorFlow',
+        date: '2024-01-10',
+        status: 'verified'
+      },
+      {
+        id: 'LA-2024-JKL90',
+        name: 'David Wilson',
+        course: 'Business Analytics with Excel & SQL',
+        date: '2024-03-05',
+        status: 'verified'
+      }
+    ];
+    
+    // Generate fake certificate ID if entered
+    document.getElementById('certificateId').addEventListener('input', function(e) {
+      if (e.target.value.length === 2 && e.target.value.toUpperCase() === 'LA') {
+        const year = new Date().getFullYear();
+        const random = Math.random().toString(36).substring(2, 7).toUpperCase();
+        e.target.value = `LA-${year}-${random}`;
+      }
+    });
+    
+    // Verify Certificate
+    function verifyCertificate() {
+      const certificateId = document.getElementById('certificateId').value.trim();
+      const fullName = document.getElementById('fullName').value.trim();
+      const courseName = document.getElementById('courseName').value.trim();
+      const issueDate = document.getElementById('issueDate').value;
+      const consent = document.getElementById('consent').checked;
+      
+      const resultContainer = document.getElementById('verificationResult');
+      const resultIcon = document.getElementById('resultIcon');
+      const resultTitle = document.getElementById('resultTitle');
+      const resultMessage = document.getElementById('resultMessage');
+      const certificateDetails = document.getElementById('certificateDetails');
+      
+      // Check consent
+      if (!consent) {
+        alert('Please consent to certificate verification by checking the box.');
+        return;
+      }
+      
+      // Simulate API call delay
+      resultContainer.classList.remove('hidden');
+      resultContainer.classList.add('animate-fade-in');
+      
+      // Show loading state
+      resultIcon.className = 'w-20 h-20 mx-auto rounded-full bg-gradient-to-r from-primary-500 to-cyan-500 flex items-center justify-center mb-4';
+      resultIcon.innerHTML = '<i class="fas fa-spinner fa-spin text-white text-3xl"></i>';
+      resultTitle.textContent = 'Verifying Certificate...';
+      resultMessage.textContent = 'Please wait while we verify your certificate.';
+      certificateDetails.classList.add('hidden');
+      
+      setTimeout(() => {
+        // Find certificate in database
+        let foundCertificate = null;
+        
+        if (certificateId) {
+          foundCertificate = certificateDatabase.find(cert => 
+            cert.id.toLowerCase() === certificateId.toLowerCase()
+          );
+        } else if (fullName && courseName) {
+          foundCertificate = certificateDatabase.find(cert => 
+            cert.name.toLowerCase().includes(fullName.toLowerCase()) &&
+            cert.course.toLowerCase().includes(courseName.toLowerCase())
+          );
+        }
+        
+        if (foundCertificate) {
+          // Success - Certificate found
+          resultIcon.className = 'w-20 h-20 mx-auto rounded-full status-verified flex items-center justify-center mb-4';
+          resultIcon.innerHTML = '<i class="fas fa-check-circle text-white text-3xl"></i>';
+          resultTitle.textContent = 'Certificate Verified!';
+          resultMessage.textContent = 'This certificate is authentic and issued by Loid Analytics.';
+          
+          // Populate certificate details
+          document.getElementById('detailId').textContent = foundCertificate.id;
+          document.getElementById('detailName').textContent = foundCertificate.name;
+          document.getElementById('detailCourse').textContent = foundCertificate.course;
+          document.getElementById('detailDate').textContent = new Date(foundCertificate.date).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          });
+          document.getElementById('detailStatus').textContent = 'Verified ✓';
+          document.getElementById('detailStatus').className = 'font-medium text-green-600 dark:text-green-400';
+          
+          certificateDetails.classList.remove('hidden');
+        } else {
+          // Failure - Certificate not found
+          resultIcon.className = 'w-20 h-20 mx-auto rounded-full status-invalid flex items-center justify-center mb-4';
+          resultIcon.innerHTML = '<i class="fas fa-times-circle text-white text-3xl"></i>';
+          resultTitle.textContent = 'Certificate Not Found';
+          resultMessage.textContent = 'The certificate details provided do not match our records. Please check and try again.';
+          certificateDetails.classList.add('hidden');
+        }
+        
+        // Scroll to result
+        resultContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 1500);
+    }
+    
+    // Scan QR Code
+    function scanQRCode() {
+      alert('QR Code Scanner: In a real application, this would open your camera to scan QR codes.\n\nFor demonstration, you can enter certificate ID manually.');
+      
+      // Simulate QR code scan with random certificate
+      const randomCert = certificateDatabase[Math.floor(Math.random() * certificateDatabase.length)];
+      document.getElementById('certificateId').value = randomCert.id;
+      document.getElementById('fullName').value = randomCert.name;
+      document.getElementById('courseName').value = randomCert.course;
+      document.getElementById('issueDate').value = randomCert.date;
+      document.getElementById('consent').checked = true;
+    }
+    
+    // Download Verification
+    function downloadVerification() {
+      const certId = document.getElementById('detailId').textContent;
+      const certName = document.getElementById('detailName').textContent;
+      const certCourse = document.getElementById('detailCourse').textContent;
+      
+      const verificationData = `Loid Analytics - Certificate Verification Result\n\n` +
+        `Certificate ID: ${certId}\n` +
+        `Name: ${certName}\n` +
+        `Course: ${certCourse}\n` +
+        `Status: Verified ✓\n` +
+        `Verification Date: ${new Date().toLocaleDateString()}\n` +
+        `Verification Time: ${new Date().toLocaleTimeString()}\n\n` +
+        `This certificate has been verified as authentic by Loid Analytics.`;
+      
+      const blob = new Blob([verificationData], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `verification-${certId}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      alert('Verification result downloaded successfully!');
+    }
+    
+    // Share Verification
+    function shareVerification() {
+      const certId = document.getElementById('detailId').textContent;
+      const certName = document.getElementById('detailName').textContent;
+      const certCourse = document.getElementById('detailCourse').textContent;
+      
+      if (navigator.share) {
+        navigator.share({
+          title: 'Certificate Verification Result',
+          text: `Certificate ${certId} for ${certName} has been verified as authentic by Loid Analytics.`,
+          url: window.location.href,
+        });
+      } else {
+        alert('Share feature not available. Copy this link to share:\n\n' + window.location.href);
+      }
+    }
+    
+    // New Verification
+    function newVerification() {
+      document.getElementById('verificationResult').classList.add('hidden');
+      document.getElementById('certificateId').value = '';
+      document.getElementById('fullName').value = '';
+      document.getElementById('courseName').value = '';
+      document.getElementById('issueDate').value = '';
+      document.getElementById('consent').checked = false;
+      
+      // Scroll to form
+      document.getElementById('certificateId').focus();
+      document.getElementById('certificateId').scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    // Set default date to 30 days ago
+    const defaultDate = new Date();
+    defaultDate.setDate(defaultDate.getDate() - 30);
+    document.getElementById('issueDate').valueAsDate = defaultDate;
+    
+    // Add scroll effect to navbar
+    window.addEventListener('scroll', () => {
+      const nav = document.querySelector('nav');
+      if (window.scrollY > 50) {
+        nav.classList.add('shadow-lg', 'py-3');
+        nav.classList.remove('py-4');
+      } else {
+        nav.classList.remove('shadow-lg', 'py-3');
+        nav.classList.add('py-4');
+      }
+    });
+    
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href');
+        if (targetId === '#') return;
+        
+        const targetElement = document.querySelector(targetId);
+        if (targetElement) {
+          window.scrollTo({
+            top: targetElement.offsetTop - 80,
+            behavior: 'smooth'
+          });
+          
+          // Close mobile menu if open
+          if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+            mobileMenu.classList.add('hidden');
+            mobileMenuButton.querySelector('i').className = 'fas fa-bars text-xl';
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
