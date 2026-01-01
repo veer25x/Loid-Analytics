@@ -16,8 +16,7 @@ from functools import wraps
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = Flask(__name__,
-           templates_folder='.')
+app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-key-change-in-production')
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024  # 16KB max form data
 app.config['DATA_DIR'] = Path('data')
@@ -496,3 +495,4 @@ def admin_api_statistics():
     import os
 
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'secure-password-here')
+
